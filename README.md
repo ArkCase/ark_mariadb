@@ -39,7 +39,15 @@ https://catalog.redhat.com/software/containers/rhel8/mariadb-103/5ba0acf2d70cc57
 
 
 ## Source Code
-https://github.com/sclorg/mariadb-container/
+Base Image
 
 https://catalog.redhat.com/software/containers/ubi8/s2i-core/5c83967add19c77a15918c27?container-tabs=dockerfile
+
+MariaDB - RHEL
+
+https://catalog.redhat.com/software/containers/rhel8/mariadb-103/5ba0acf2d70cc57b0d1d9e78?container-tabs=dockerfile
+
+MariaDB - Centos (with binaries)
+
+https://github.com/sclorg/mariadb-container/
 
