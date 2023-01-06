@@ -1,6 +1,6 @@
 # ark_mariadb
 
-This is a port of MariaDB Official image to Rocky 8.7.   It can be replaced with the Official images when replatforming to Centos or RHEL.
+This is a port of MariaDB 1.5 Official image to Rocky 8.7.   It can be replaced with the Official images when replatforming to Centos or RHEL.
 
 ## ubi8/s2i-core is equivelent RHEL 8 Official Base Image
 
@@ -31,6 +31,12 @@ docker rm ark_mariadb
 
 ## Parameters & Documentation:
 https://hub.docker.com/r/centos/mariadb-103-centos7
+
+or (should be identical documentation)
+
+https://catalog.redhat.com/software/containers/rhel8/mariadb-103/5ba0acf2d70cc57b0d1d9e78
+
+
 
 ## Source Code
 https://github.com/sclorg/mariadb-container/
