@@ -25,6 +25,9 @@ docker tag ark_mariadb:latest 345280441424.dkr.ecr.ap-south-1.amazonaws.com/ark_
 docker push 345280441424.dkr.ecr.ap-south-1.amazonaws.com/ark_mariadb:latest
 
 ## How to run:
+
+### Docker:
+
 docker run --name ark_mariadb -d  -e MYSQL_ROOT_PASSWORD=mypass -p 3306:3306 ark_mariadb:latest
 
 docker exec -it ark_mariadb /bin/bash
@@ -32,6 +35,10 @@ docker exec -it ark_mariadb /bin/bash
 docker stop ark_mariadb
 
 docker rm ark_mariadb
+
+### Kubernetes:
+
+kubectl create pod -f pod_ark_mariadb.yaml
 
 ## Parameters & Documentation:
 https://hub.docker.com/r/centos/mariadb-103-centos7
