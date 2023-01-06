@@ -1,5 +1,7 @@
 # ark_mariadb
 
+This is a port of MariaDB Official image to Rocky 8.7.   It can be replaced with the Official images when replatforming to Centos or RHEL.
+
 ## ubi8/s2i-core is equivelent RHEL 8 Official Base Image
 
 https://catalog.redhat.com/software/containers/ubi8/s2i-core/5c83967add19c77a15918c27?container-tabs=overview
