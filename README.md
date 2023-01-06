@@ -20,6 +20,10 @@ https://hub.docker.com/r/centos/mariadb-103-centos7
 
 docker build -t ark_mariadb:latest .
 
+docker tag ark_mariadb:latest 345280441424.dkr.ecr.ap-south-1.amazonaws.com/ark_mariadb:latest
+
+docker push 345280441424.dkr.ecr.ap-south-1.amazonaws.com/ark_mariadb:latest
+
 ## How to run:
 docker run --name ark_mariadb -d  -e MYSQL_ROOT_PASSWORD=mypass -p 3306:3306 ark_mariadb:latest
 
