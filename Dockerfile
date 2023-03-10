@@ -4,8 +4,8 @@
 ###########################################################################################################
 # How to build: 
 #
-# docker build -t 345280441424.dkr.ecr.ap-south-1.amazonaws.com/ark_mariadb:latest .
-# docker push 345280441424.dkr.ecr.ap-south-1.amazonaws.com/ark_mariadb:latest 
+# docker build -t ${BASE_REGISTRY}/arkcase/mariadb:latest .
+# docker push ${BASE_REGISTRY}/arkcase/mariadb:latest 
 #
 # How to run: (Helm)
 #
@@ -15,7 +15,7 @@
 #
 # How to run: (Docker)
 #
-# docker run --name ark_mariadb -d  -e MYSQL_ROOT_PASSWORD=mypass -p 3306:3306 345280441424.dkr.ecr.ap-south-1.amazonaws.com/ark_mariadb:latest
+# docker run --name ark_mariadb -d  -e MYSQL_ROOT_PASSWORD=mypass -p 3306:3306 ${BASE_REGISTRY}/ark_mariadb:latest
 # docker exec -it ark_mariadb /bin/bash
 # docker stop ark_mariadb
 # docker rm ark_mariadb
@@ -112,7 +112,12 @@
 #Notice: When mouting a directory from the host into the container, ensure that the mounted directory has the appropriate permissions and that the owner and group of the directory matches the user UID or name which is running inside the container.
 ###########################################################################################################
 
-FROM 345280441424.dkr.ecr.ap-south-1.amazonaws.com/ark_base:latest
+ARG BASE_REGISTRY
+ARG BASE_REPO="arkcase/base"
+ARG BASE_TAG="8.7.0"
+ARG VER="10.5"
+
+FROM "${BASE_REGISTRY}/${BASE_REPO}:${BASE_TAG}"
 
 ###########################################################################################################
 # START: MariaDb Image ####################################################################################
@@ -153,12 +158,13 @@ EXPOSE 3306
 # safe in the future. This should *never* change, the last test is there
 # to make sure of that.
 RUN yum -y module enable mariadb:$MYSQL_VERSION && \
-    INSTALL_PKGS="policycoreutils rsync tar gettext hostname bind-utils groff-base mariadb-server" && \
+    INSTALL_PKGS="policycoreutils rsync tar gettext hostname bind-utils groff-base mariadb-server python39-pyyaml" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum -y clean all --enablerepo='*' && \
+    update-alternatives --set python /usr/bin/python3.9 && \
     mkdir -p /var/lib/mysql/data && chown -R mysql.0 /var/lib/mysql && \
-    test "$(id mysql)" = "uid=27(mysql) gid=27(mysql) groups=27(mysql)"
+    test "$(id -u mysql):$(id -g mysql)" = "27:27"
 
 # Get prefix path and path to scripts rather than hard-code them in scripts
 ENV CONTAINER_SCRIPTS_PATH=/usr/share/container-scripts/mysql \
@@ -180,7 +186,7 @@ RUN rm -rf /etc/my.cnf.d/* && \
 # https://github.com/sclorg/httpd-container/issues/30
 # VOLUME ["/var/lib/mysql/data"]
 
-USER 27
+USER mysql
 
 ENTRYPOINT ["container-entrypoint"]
 CMD ["run-mysqld"]
