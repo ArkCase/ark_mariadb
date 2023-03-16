@@ -1,4 +1,4 @@
-# ark_mariadb
+# Mariadb for Arkcase
 
 This is a port of MariaDB 1.5 Official image to Rocky 8.7.   It can be replaced with the Official images when replatforming to Centos or RHEL.
 
