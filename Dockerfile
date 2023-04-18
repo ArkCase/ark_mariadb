@@ -130,7 +130,10 @@ FROM "${PUBLIC_REGISTRY}/${BASE_REPO}:${BASE_TAG}"
 # Note: ubi8/s2i-core is equivelent to above with RHEL 8 Official
 # Note: rhel8/mariadb-105 is equivelent to above and below with RHEL 8 Offical
 #
-ENV MYSQL_VERSION=${VER} \
+
+ARG VER
+
+ENV MYSQL_VERSION="${VER}" \
     APP_DATA=/opt/app-root/src \
     HOME=/var/lib/mysql \
     SUMMARY="MariaDB ${VER} SQL database server" \
