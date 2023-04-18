@@ -4,8 +4,7 @@
 ###########################################################################################################
 # How to build: 
 #
-# docker build -t ${BASE_REGISTRY}/arkcase/mariadb:latest .
-# docker push ${BASE_REGISTRY}/arkcase/mariadb:latest 
+# docker build -t arkcase/mariadb:latest .
 #
 # How to run: (Helm)
 #
@@ -15,7 +14,7 @@
 #
 # How to run: (Docker)
 #
-# docker run --name ark_mariadb -d  -e MYSQL_ROOT_PASSWORD=mypass -p 3306:3306 ${BASE_REGISTRY}/ark_mariadb:latest
+# docker run --name ark_mariadb -d  -e MYSQL_ROOT_PASSWORD=mypass -p 3306:3306 ark_mariadb:latest
 # docker exec -it ark_mariadb /bin/bash
 # docker stop ark_mariadb
 # docker rm ark_mariadb
@@ -112,12 +111,12 @@
 #Notice: When mouting a directory from the host into the container, ensure that the mounted directory has the appropriate permissions and that the owner and group of the directory matches the user UID or name which is running inside the container.
 ###########################################################################################################
 
-ARG BASE_REGISTRY
+ARG PUBLIC_REGISTRY="public.ecr.aws"
 ARG BASE_REPO="arkcase/base"
 ARG BASE_TAG="8.7.0"
 ARG VER="10.5"
 
-FROM "${BASE_REGISTRY}/${BASE_REPO}:${BASE_TAG}"
+FROM "${PUBLIC_REGISTRY}/${BASE_REPO}:${BASE_TAG}"
 
 ###########################################################################################################
 # START: MariaDb Image ####################################################################################
@@ -131,10 +130,10 @@ FROM "${BASE_REGISTRY}/${BASE_REPO}:${BASE_TAG}"
 # Note: ubi8/s2i-core is equivelent to above with RHEL 8 Official
 # Note: rhel8/mariadb-105 is equivelent to above and below with RHEL 8 Offical
 #
-ENV MYSQL_VERSION=10.5 \
+ENV MYSQL_VERSION=${VER} \
     APP_DATA=/opt/app-root/src \
     HOME=/var/lib/mysql \
-    SUMMARY="MariaDB 10.5 SQL database server" \
+    SUMMARY="MariaDB ${VER} SQL database server" \
     DESCRIPTION="MariaDB is a multi-user, multi-threaded SQL database server. The container \
 image provides a containerized packaging of the MariaDB mysqld daemon and client application. \
 The mysqld server daemon accepts connections from clients and provides access to content from \
@@ -143,7 +142,7 @@ MariaDB databases on behalf of the clients."
 LABEL summary="$SUMMARY" \
       description="$DESCRIPTION" \
       io.k8s.description="$DESCRIPTION" \
-      io.k8s.display-name="MariaDB 10.5" \
+      io.k8s.display-name="MariaDB ${VER}" \
       io.openshift.expose-services="3306:mysql" \
       io.openshift.tags="database,mysql,mariadb,mariadb105,mariadb-105" \
       com.redhat.component="mariadb-105-container" \
@@ -170,9 +169,9 @@ RUN yum -y module enable mariadb:$MYSQL_VERSION && \
 ENV CONTAINER_SCRIPTS_PATH=/usr/share/container-scripts/mysql \
     MYSQL_PREFIX=/usr
 
-COPY 10.5/root-common /
-COPY 10.5/s2i-common/bin/ $STI_SCRIPTS_PATH
-COPY 10.5/root /
+COPY ${VER}/root-common /
+COPY ${VER}/s2i-common/bin/ $STI_SCRIPTS_PATH
+COPY ${VER}/root /
 
 # this is needed due to issues with squash
 # when this directory gets rm'd by the container-setup
