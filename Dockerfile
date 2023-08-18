@@ -193,7 +193,7 @@ RUN usermod -a -G ${ACM_GROUP} mysql
 
 USER mysql
 
-ENTRYPOINT ["entrypoint"]
+ENTRYPOINT ["/entrypoint"]
 CMD ["run-mysqld"]
 
 ###########################################################################################################
