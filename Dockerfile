@@ -113,7 +113,7 @@
 
 ARG PUBLIC_REGISTRY="public.ecr.aws"
 ARG BASE_REPO="arkcase/base"
-ARG BASE_TAG="8.7.0"
+ARG BASE_TAG="8.8-01"
 ARG VER="10.5"
 
 FROM "${PUBLIC_REGISTRY}/${BASE_REPO}:${BASE_TAG}"
@@ -184,13 +184,15 @@ RUN rm -rf /etc/my.cnf.d/* && \
     /usr/libexec/container-setup && \
     rpm-file-permissions
 
+RUN usermod -a -G ${ACM_GROUP} mysql
+
 # Not using VOLUME statement since it's not working in OpenShift Online:
 # https://github.com/sclorg/httpd-container/issues/30
 # VOLUME ["/var/lib/mysql/data"]
 
 USER mysql
 
-ENTRYPOINT ["container-entrypoint"]
+ENTRYPOINT ["entrypoint"]
 CMD ["run-mysqld"]
 
 ###########################################################################################################
