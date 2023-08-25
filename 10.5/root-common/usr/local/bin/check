@@ -1,0 +1,12 @@
+#!/bin/bash
+
+[ ${#} -eq 1 ] || set -- "ready"
+
+CMD=()
+case "${1,,}" in
+	ready | live ) CMD=(mariadb -u root -h 127.0.0.1) ;;
+	startup ) CMD=(mariadb -h localhost) ;;
+	* ) exit 1 ;;
+esac
+
+exec "${CMD[@]}" <<< "select now();"
