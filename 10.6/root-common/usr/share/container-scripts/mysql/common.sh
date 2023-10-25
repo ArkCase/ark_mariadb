@@ -78,7 +78,7 @@ function wait_for_mysql() {
 # Start local MySQL server with a defaults file
 function start_local_mysql() {
   log_info 'Starting MySQL server with disabled networking ...'
-  ${MYSQL_PREFIX}/libexec/mysqld \
+  ${MYSQL_PREFIX}/sbin/mysqld \
     --defaults-file=$MYSQL_DEFAULTS_FILE \
     --skip-networking --socket=/tmp/mysql.sock "$@" &
   mysql_pid=$!
@@ -258,7 +258,7 @@ function number2version() {
 
 # Prints version of the mysqld that is currently available (string)
 function mysqld_version() {
-  ${MYSQL_PREFIX}/libexec/mysqld -V | awk '{print $3}'
+  ${MYSQL_PREFIX}/sbin/mysqld -V | awk '{print $3}'
 }
 
 # Returns version from the daemon in integer format
