@@ -1,5 +1,5 @@
 # Note: ubi8/s2i-core is equivelent RHEL 8 Official Base Image
-# Note: rhel8/mariadb-105 is equivelent RHEL 8 Offical MariaDB Official image 
+# Note: rhel8/mariadb-106 is equivelent RHEL 8 Offical MariaDB Official image 
 
 ###########################################################################################################
 # How to build: 
@@ -114,8 +114,8 @@
 ARG PUBLIC_REGISTRY="public.ecr.aws"
 ARG BASE_REPO="arkcase/base"
 ARG BASE_TAG="8-02"
-ARG VER="10.5"
-ARG BLD="03"
+ARG VER="10.6"
+ARG BLD="01"
 
 FROM "${PUBLIC_REGISTRY}/${BASE_REPO}:${BASE_TAG}"
 
@@ -129,7 +129,7 @@ FROM "${PUBLIC_REGISTRY}/${BASE_REPO}:${BASE_TAG}"
 # FROM ubi8/s2i-core
 #
 # Note: ubi8/s2i-core is equivelent to above with RHEL 8 Official
-# Note: rhel8/mariadb-105 is equivelent to above and below with RHEL 8 Offical
+# Note: rhel8/mariadb-106 is equivelent to above and below with RHEL 8 Offical
 #
 
 ARG VER
@@ -148,11 +148,11 @@ LABEL summary="$SUMMARY" \
       io.k8s.description="$DESCRIPTION" \
       io.k8s.display-name="MariaDB ${VER}" \
       io.openshift.expose-services="3306:mysql" \
-      io.openshift.tags="database,mysql,mariadb,mariadb105,mariadb-105" \
-      com.redhat.component="mariadb-105-container" \
-      name="rhel8/mariadb-105" \
+      io.openshift.tags="database,mysql,mariadb,mariadb106,mariadb-106" \
+      com.redhat.component="mariadb-106-container" \
+      name="rhel8/mariadb-106" \
       version="1" \
-      usage="podman run -d -e MYSQL_USER=user -e MYSQL_PASSWORD=pass -e MYSQL_DATABASE=db -p 3306:3306 rhel8/mariadb-105" \
+      usage="podman run -d -e MYSQL_USER=user -e MYSQL_PASSWORD=pass -e MYSQL_DATABASE=db -p 3306:3306 rhel8/mariadb-106" \
       maintainer="SoftwareCollections.org <sclorg@redhat.com>"
 
 EXPOSE 3306
@@ -160,10 +160,13 @@ EXPOSE 3306
 # This image must forever use UID 27 for mysql user so our volumes are
 # safe in the future. This should *never* change, the last test is there
 # to make sure of that.
-RUN yum -y module enable mariadb:$MYSQL_VERSION && \
-    INSTALL_PKGS="policycoreutils rsync tar gettext hostname bind-utils groff-base mariadb-server python39-pyyaml" && \
+COPY --chown=root:root MariaDB.repo /etc/yum.repos.d
+RUN groupadd --gid 27 --system mysql && \
+    useradd --gid mysql --home-dir /var/lib/mysql --create-home --shell /sbin/nologin --uid 27 --system mysql && \
+    sed -i -e "s;\${MYSQL_VERSION};${MYSQL_VERSION};g" /etc/yum.repos.d/MariaDB.repo && \
+    yum -y update && \
+    INSTALL_PKGS="policycoreutils rsync tar gettext hostname bind-utils groff-base MariaDB-server MariaDB-backup MariaDB-gssapi-server python39-pyyaml" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
-    rpm -V $INSTALL_PKGS && \
     yum -y clean all --enablerepo='*' && \
     update-alternatives --set python /usr/bin/python3.9 && \
     mkdir -p /var/lib/mysql/data && chown -R mysql.0 /var/lib/mysql && \
