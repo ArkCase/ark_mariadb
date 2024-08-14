@@ -165,7 +165,6 @@ COPY --chown=root:root MariaDB.repo /etc/yum.repos.d
 RUN groupadd --gid 27 --system mysql && \
     useradd --gid mysql --home-dir /var/lib/mysql --create-home --shell /sbin/nologin --uid 27 --system mysql && \
     sed -i -e "s;\${MYSQL_VERSION};${MYSQL_VERSION};g" /etc/yum.repos.d/MariaDB.repo && \
-    yum -y update && \
     INSTALL_PKGS="policycoreutils rsync tar gettext hostname bind-utils groff-base MariaDB-server MariaDB-backup MariaDB-gssapi-server python39-pyyaml" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     yum -y clean all --enablerepo='*' && \
