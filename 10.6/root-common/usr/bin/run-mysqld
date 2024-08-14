@@ -21,7 +21,12 @@ else
 fi
 
 # init files
-process_extending_files ${APP_DATA}/mysql-init/ ${CONTAINER_SCRIPTS_PATH}/init/
+if [ "${MYSQL_DATADIR_FIRST_INIT}" == "true" ] ; then
+  process_extending_files "${APP_DATA}/mysql-init/" "${CONTAINER_SCRIPTS_PATH}/init/"
+fi
+
+# boot files
+process_extending_files "${APP_DATA}/mysql-start/" "${CONTAINER_SCRIPTS_PATH}/start/"
 
 # Restart the MySQL server with public IP bindings
 shutdown_local_mysql
