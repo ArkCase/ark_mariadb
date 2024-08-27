@@ -1,21 +1,8 @@
 #!/bin/bash
 set -euo pipefail
-
-timestamp() {
-	/usr/bin/date -Ins -u
-}
-
-say() {
-	echo -e "$(timestamp): ${@}"
-}
-
-fail() {
-	say "${@}" 1>&2
-	exit ${EXIT_CODE:-1}
-}
+. /.functions
 
 # Update the SSL stuff
-[ -v SSL_DIR ] || export SSL_DIR="/.ssl"
-acme-init
+init_ssl
 
-exec "container-entrypoint" "${@}"
+execute "container-entrypoint" "${@}"
