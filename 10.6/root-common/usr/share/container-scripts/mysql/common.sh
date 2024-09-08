@@ -221,7 +221,7 @@ function process_extending_files() {
     else
       source $default_dir/$filename
     fi
-  done <<<"$(get_matched_files "$custom_dir" "$default_dir" '*.sh' | sort -u | sed -e '/^\s*$/d')"
+  done < <(get_matched_files "$custom_dir" "$default_dir" '*.sh' | sort -u | sed -e '/^\s*$/d')
 }
 
 # process extending config files in $1 and $2 directories
