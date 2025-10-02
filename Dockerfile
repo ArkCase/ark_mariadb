@@ -138,7 +138,7 @@ FROM "${BASE_IMG}"
 ARG VER
 
 ENV MYSQL_VERSION="${VER}" \
-    APP_DATA=/opt/app-root/src \
+    APP_DATA=${APP_ROOT}/src \
     HOME=/var/lib/mysql \
     SUMMARY="MariaDB ${VER} SQL database server" \
     DESCRIPTION="MariaDB is a multi-user, multi-threaded SQL database server. The container \
