@@ -32,7 +32,7 @@ rm -f ${MYSQL_CONFIG_FILE}.d/*
 
 # we may add options during service init, so we need to have this dir writable by daemon user
 chown -R mysql:0 ${MYSQL_CONFIG_FILE}.d ${MYSQL_CONFIG_FILE}
-restorecon -R ${MYSQL_CONFIG_FILE}.d ${MYSQL_CONFIG_FILE}
+# restorecon -R ${MYSQL_CONFIG_FILE}.d ${MYSQL_CONFIG_FILE}
 
 # API of the container are standard paths /etc/my.cnf and /etc/my.cnf.d
 # we already include own /etc/my.cnf for container, but for cases the
@@ -48,7 +48,7 @@ fi
 # setup directory for data
 mkdir -p /var/lib/mysql/data
 chown -R mysql:0 /var/lib/mysql
-restorecon -R /var/lib/mysql
+# restorecon -R /var/lib/mysql
 
 # Loosen permission bits for group to avoid problems running container with
 # arbitrary UID

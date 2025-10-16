@@ -116,71 +116,63 @@ ARG VER="10.6"
 
 ARG BASE_REGISTRY="${PUBLIC_REGISTRY}"
 ARG BASE_REPO="arkcase/base"
-ARG BASE_VER="8"
+ARG BASE_VER="22.04"
 ARG BASE_VER_PFX=""
 ARG BASE_IMG="${BASE_REGISTRY}/${BASE_REPO}:${BASE_VER_PFX}${BASE_VER}"
 
 FROM "${BASE_IMG}"
 
-###########################################################################################################
-# START: MariaDb Image ####################################################################################
-###########################################################################################################
-
-#   Based on: https://hub.docker.com/r/centos/mariadb-103-centos7
-#   Source Code:  https://github.com/sclorg/mariadb-container/
-
-# FROM ubi8/s2i-core
-#
-# Note: ubi8/s2i-core is equivelent to above with RHEL 8 Official
-# Note: rhel8/mariadb-106 is equivelent to above and below with RHEL 8 Offical
-#
-
 ARG VER
 
 ENV MYSQL_VERSION="${VER}" \
-    APP_DATA=${APP_ROOT}/src \
-    HOME=/var/lib/mysql \
-    SUMMARY="MariaDB ${VER} SQL database server" \
+    HOME="/var/lib/mysql" \
+    APP_DATA="${APP_ROOT}/src"
+
+ENV SUMMARY="MariaDB ${VER} SQL database server" \
     DESCRIPTION="MariaDB is a multi-user, multi-threaded SQL database server. The container \
 image provides a containerized packaging of the MariaDB mysqld daemon and client application. \
 The mysqld server daemon accepts connections from clients and provides access to content from \
 MariaDB databases on behalf of the clients."
 
-LABEL summary="$SUMMARY" \
-      description="$DESCRIPTION" \
-      io.k8s.description="$DESCRIPTION" \
+LABEL summary="${SUMMARY}" \
+      description="${DESCRIPTION}" \
+      io.k8s.description="${DESCRIPTION}" \
       io.k8s.display-name="MariaDB ${VER}" \
-      io.openshift.expose-services="3306:mysql" \
-      io.openshift.tags="database,mysql,mariadb,mariadb106,mariadb-106" \
-      com.redhat.component="mariadb-106-container" \
-      name="rhel8/mariadb-106" \
-      version="1" \
-      usage="podman run -d -e MYSQL_USER=user -e MYSQL_PASSWORD=pass -e MYSQL_DATABASE=db -p 3306:3306 rhel8/mariadb-106" \
-      maintainer="SoftwareCollections.org <sclorg@redhat.com>"
+      version="1"
 
 EXPOSE 3306
 
-# This image must forever use UID 27 for mysql user so our volumes are
+ENV APP_USER="mysql"
+ENV APP_UID="28"
+ENV APP_GROUP="${APP_USER}"
+ENV APP_GID="${APP_UID}"
+
+ENV DATA_DIR="${HOME}/data"
+
+# This image must forever use UID 28 for mysql user so our volumes are
 # safe in the future. This should *never* change, the last test is there
 # to make sure of that.
-COPY --chown=root:root MariaDB.repo /etc/yum.repos.d
-RUN groupadd --gid 27 --system mysql && \
-    useradd --gid mysql --home-dir /var/lib/mysql --create-home --shell /sbin/nologin --uid 27 --system mysql && \
-    sed -i -e "s;\${MYSQL_VERSION};${MYSQL_VERSION};g" /etc/yum.repos.d/MariaDB.repo && \
-    INSTALL_PKGS="policycoreutils rsync tar gettext hostname bind-utils groff-base MariaDB-server MariaDB-backup MariaDB-gssapi-server python39-pyyaml" && \
-    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
-    yum -y clean all --enablerepo='*' && \
-    update-alternatives --set python /usr/bin/python3.9 && \
-    mkdir -p /var/lib/mysql/data && chown -R mysql.0 /var/lib/mysql && \
-    test "$(id -u mysql):$(id -g mysql)" = "27:27"
+RUN groupadd --gid "${APP_UID}" --system "${APP_USER}" && \
+    useradd --gid "${APP_GROUP}" --home-dir "${HOME}" --create-home --shell /sbin/nologin --uid "${APP_UID}" --system "${APP_USER}"
+
+RUN apt-get -y install \
+        groff-base \
+        mariadb-client \
+        mariadb-server \
+      && \
+    apt-get clean
+    
+
+RUN mkdir -p "${DATA_DIR}" && chown -R "${APP_USER}:0" "${HOME}" && \
+    test "$(id -u "${APP_USER}"):$(id -g "${APP_GROUP}")" = "${APP_UID}:${APP_GID}"
 
 # Get prefix path and path to scripts rather than hard-code them in scripts
-ENV CONTAINER_SCRIPTS_PATH=/usr/share/container-scripts/mysql \
-    MYSQL_PREFIX=/usr
+ENV CONTAINER_SCRIPTS_PATH="/usr/share/container-scripts/mysql" \
+    MYSQL_PREFIX="/usr"
 
-COPY ${VER}/root-common /
-COPY ${VER}/s2i-common/bin/ $STI_SCRIPTS_PATH
-COPY ${VER}/root /
+COPY "${VER}/root-common" /
+COPY "${VER}/s2i-common/bin/" "/usr/local/bin"
+COPY "${VER}/root" /
 
 # this is needed due to issues with squash
 # when this directory gets rm'd by the container-setup
@@ -188,15 +180,15 @@ COPY ${VER}/root /
 # Also reset permissions of filesystem to default values
 RUN rm -rf /etc/my.cnf.d/* && \
     /usr/libexec/container-setup && \
-    rpm-file-permissions
-
-RUN usermod -a -G ${ACM_GROUP} mysql
+    /usr/libexec/fix-permissions "${HOME}" && \
+    usermod -a -G "${ACM_GROUP}" "${APP_USER}" && \
+    secure-permissions
 
 # Not using VOLUME statement since it's not working in OpenShift Online:
 # https://github.com/sclorg/httpd-container/issues/30
 # VOLUME ["/var/lib/mysql/data"]
 
-USER mysql
+USER "${APP_USER}"
 
 ENTRYPOINT ["/entrypoint"]
 CMD ["run-mysqld"]
