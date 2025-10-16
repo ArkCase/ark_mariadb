@@ -160,8 +160,8 @@ RUN apt-get -y install \
         mariadb-client \
         mariadb-server \
       && \
+    dpkg --remove --force-depends rsync && \
     apt-get clean
-    
 
 RUN mkdir -p "${DATA_DIR}" && chown -R "${APP_USER}:0" "${HOME}" && \
     test "$(id -u "${APP_USER}"):$(id -g "${APP_GROUP}")" = "${APP_UID}:${APP_GID}"
