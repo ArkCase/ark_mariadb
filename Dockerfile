@@ -147,7 +147,8 @@ ENV APP_UID="28"
 ENV APP_GROUP="${APP_USER}"
 ENV APP_GID="${APP_UID}"
 
-ENV DATA_DIR="${HOME}/data"
+ENV DATA_DIR="${HOME}/data" \
+    RUN_DIR="/run/mysqld"
 
 # This image must forever use UID 28 for mysql user so our volumes are
 # safe in the future. This should *never* change, the last test is there
@@ -161,7 +162,9 @@ RUN apt-get -y install \
         mariadb-server \
       && \
     dpkg --remove --force-depends rsync && \
-    apt-get clean
+    apt-get clean && \
+    mkdir -p "${RUN_DIR}" && \
+    chown -R "${APP_UID}:${APP_GID}" "${RUN_DIR}"
 
 RUN mkdir -p "${DATA_DIR}" && chown -R "${APP_USER}:0" "${HOME}" && \
     test "$(id -u "${APP_USER}"):$(id -g "${APP_GROUP}")" = "${APP_UID}:${APP_GID}"
