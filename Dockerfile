@@ -112,7 +112,10 @@
 ###########################################################################################################
 
 ARG PUBLIC_REGISTRY="public.ecr.aws"
-ARG VER="10.6"
+ARG VER="11.4"
+
+ARG MARIADB_REPO_SCRIPT="https://r.mariadb.com/downloads/mariadb_repo_setup"
+ARG MARIADB_REPO_SCRIPT_SUM="73f4ab14ccc3ceb8c03bb283dd131a3235cfc28086475f43e9291d2060d48c97"
 
 ARG BASE_REGISTRY="${PUBLIC_REGISTRY}"
 ARG BASE_REPO="arkcase/base"
@@ -123,6 +126,8 @@ ARG BASE_IMG="${BASE_REGISTRY}/${BASE_REPO}:${BASE_VER_PFX}${BASE_VER}"
 FROM "${BASE_IMG}"
 
 ARG VER
+ARG MARIADB_REPO_SCRIPT
+ARG MARIADB_REPO_SCRIPT_SUM
 
 ENV MYSQL_VERSION="${VER}" \
     HOME="/var/lib/mysql" \
@@ -156,7 +161,13 @@ ENV DATA_DIR="${HOME}/data" \
 RUN groupadd --gid "${APP_UID}" --system "${APP_USER}" && \
     useradd --gid "${APP_GROUP}" --home-dir "${HOME}" --create-home --shell /sbin/nologin --uid "${APP_UID}" --system "${APP_USER}"
 
-RUN apt-get -y install \
+RUN export FILENAME="setup" && \
+    curl -fsSL -o "${FILENAME}" "${MARIADB_REPO_SCRIPT}" && \
+    echo "${MARIADB_REPO_SCRIPT_SUM} ${FILENAME}" | sha256sum -c - && \
+    chmod a+x "${FILENAME}" && \
+    ./"${FILENAME}" --mariadb-server-version="${VER}" && \
+    rm -f "${FILENAME}" && \
+    apt-get -y install \
         groff-base \
         mariadb-client \
         mariadb-server \
