@@ -2,6 +2,11 @@
 set -euo pipefail
 . /.functions
 
+#
+# First things first, FIPS!!
+#
+set_fips
+
 # Update the SSL stuff
 init_ssl
 
