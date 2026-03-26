@@ -1,13 +1,11 @@
 #!/bin/bash
+
 set -euo pipefail
 . /.functions
 
 #
-# First things first, FIPS!!
+# Init all the SSL-related stuff
 #
-set_fips
-
-# Update the SSL stuff
 init_ssl
 
-execute "container-entrypoint" "${@}"
+exec "container-entrypoint" "${@}"
