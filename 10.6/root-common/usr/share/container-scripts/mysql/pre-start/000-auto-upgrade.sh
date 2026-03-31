@@ -22,7 +22,7 @@
 		#
 		# FIRST THINGS FIRST!! See if we need to do an auto-upgrade
 		#
-		mysql_upgrade -u root --check-if-upgrade-is-needed || quit "No upgrade appears to necessary necessary"
+		mysql_upgrade ${mysql_flags} --check-if-upgrade-is-needed || quit "No upgrade appears to necessary necessary"
 
 		#
 		# An upgrade appears to be needed ... so let's do it!
@@ -35,7 +35,7 @@
 		TIMESTAMP="$(date -u "+%Y%m%d-%H%M%SZ")"
 		(
 			running "Attempting an in-place upgrade!"
-			mysql_upgrade -u root -f || fail "Upgrade attempt failed (rc=${?}), logs at [${UPGRADE_LOG}]"
+			mysql_upgrade ${mysql_flags} --force || fail "Upgrade attempt failed (rc=${?}), logs at [${UPGRADE_LOG}]"
 			ok "Upgrade complete"
 		) |& tee "${UPGRADE_LOG}"
 		RC=${PIPESTATUS[0]}
