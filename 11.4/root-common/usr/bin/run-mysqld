@@ -26,7 +26,9 @@ if [ "${MYSQL_DATADIR_FIRST_INIT}" == "true" ] ; then
 fi
 
 # boot files
+process_extending_files "${APP_DATA}/mysql-pre-start/" "${CONTAINER_SCRIPTS_PATH}/pre-start/"
 process_extending_files "${APP_DATA}/mysql-start/" "${CONTAINER_SCRIPTS_PATH}/start/"
+process_extending_files "${APP_DATA}/mysql-post-start/" "${CONTAINER_SCRIPTS_PATH}/post-start/"
 
 # Restart the MySQL server with public IP bindings
 shutdown_local_mysql
