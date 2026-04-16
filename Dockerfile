@@ -113,7 +113,9 @@
 
 ARG FIPS=""
 ARG PUBLIC_REGISTRY="public.ecr.aws"
-ARG VER="10.6"
+ARG VER="11.4"
+
+ARG MARIADB_KEYRING_SRC="https://mariadb.org/mariadb_release_signing_key.pgp"
 
 ARG BASE_REGISTRY="${PUBLIC_REGISTRY}"
 ARG BASE_REPO="arkcase/base"
@@ -124,6 +126,7 @@ ARG BASE_IMG="${BASE_REGISTRY}/${BASE_REPO}${FIPS}:${BASE_VER_PFX}${BASE_VER}"
 FROM "${BASE_IMG}"
 
 ARG VER
+ARG MARIADB_KEYRING_SRC
 
 ENV MYSQL_VERSION="${VER}" \
     HOME="/var/lib/mysql" \
@@ -157,26 +160,50 @@ ENV DATA_DIR="${HOME}/data" \
 RUN groupadd --gid "${APP_UID}" --system "${APP_USER}" && \
     useradd --gid "${APP_GROUP}" --home-dir "${HOME}" --create-home --shell /sbin/nologin --uid "${APP_UID}" --system "${APP_USER}"
 
-RUN apt-get -y install \
+RUN --mount=type=bind,target=/src \
+    mkdir -p /etc/apt/keyrings && \
+    export KEYRING="/etc/apt/trusted.gpg.d/mariadb-keyring.gpg" && \
+    curl -fsSL  "${MARIADB_KEYRING_SRC}" | gpg --dearmor -o "${KEYRING}" && \
+    chmod a=r "${KEYRING}" && \
+    SOURCES="/etc/apt/sources.list.d/mariadb.sources" && \
+    envsubst < /src/mariadb.sources > "${SOURCES}" && \
+    chown root:root "${SOURCES}" && \
+    chmod 0440 "${SOURCES}" && \
+    apt-get update && \
+    apt-get -y install \
         groff-base \
         mariadb-client \
         mariadb-server \
       && \
     dpkg --remove --force-depends rsync && \
     apt-get clean && \
-    mkdir -p "${RUN_DIR}" && \
-    chown -R "${APP_UID}:${APP_GID}" "${RUN_DIR}"
-
-RUN mkdir -p "${DATA_DIR}" && chown -R "${APP_USER}:0" "${HOME}" && \
+    mkdir -p "${RUN_DIR}" "${DATA_DIR}" && \
+    chown -R "${APP_UID}:${APP_GID}" "${RUN_DIR}" && \
+    chown -R "${APP_USER}:0" "${HOME}" && \
+    cd "${HOME}" && \
+    rm -rvf * && \
     test "$(id -u "${APP_USER}"):$(id -g "${APP_GROUP}")" = "${APP_UID}:${APP_GID}"
+
+RUN --mount=type=bind,target=/src \
+    CONF="/etc/ssl/openssl.cnf" && \
+    cp -vf /src/openssl.cnf "${CONF}" && \
+    chown root:root "${CONF}" && \
+    chmod 0444 "${CONF}"
+
+ENV OPENSSL_CONF_INCLUDE="/etc/ssl/openssl.cnf.d"
+RUN --mount=type=bind,target=/src \
+    mkdir -p "${OPENSSL_CONF_INCLUDE}" && \
+    cp -vf /src/fipsmodule.cnf "${OPENSSL_CONF_INCLUDE}" && \
+    chown -R root:root "${OPENSSL_CONF_INCLUDE}" && \
+    chmod -R 0444 "${OPENSSL_CONF_INCLUDE}"
 
 # Get prefix path and path to scripts rather than hard-code them in scripts
 ENV CONTAINER_SCRIPTS_PATH="/usr/share/container-scripts/mysql" \
     MYSQL_PREFIX="/usr"
 
-COPY "${VER}/root-common" /
-COPY "${VER}/s2i-common/bin/" "/usr/local/bin"
-COPY "${VER}/root" /
+COPY "scripts/root-common" /
+COPY "scripts/s2i-common/bin/" "/usr/local/bin"
+COPY "scripts/root" /
 
 # this is needed due to issues with squash
 # when this directory gets rm'd by the container-setup

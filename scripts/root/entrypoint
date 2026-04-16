@@ -8,4 +8,6 @@ set -euo pipefail
 #
 init_ssl
 
+# export OPENSSL_CONF="/etc/ssl/openssl-fips.cnf"
+
 exec "container-entrypoint" "${@}"
