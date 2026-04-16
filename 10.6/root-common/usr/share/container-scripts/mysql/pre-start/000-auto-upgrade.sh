@@ -22,7 +22,7 @@
 		#
 		# FIRST THINGS FIRST!! See if we need to do an auto-upgrade
 		#
-		mysql_upgrade ${mysql_flags} --check-if-upgrade-is-needed || quit "No upgrade appears to necessary necessary"
+		mysql_upgrade ${mysql_flags} --check-if-upgrade-is-needed || quit "No upgrade appears to be necessary"
 
 		#
 		# An upgrade appears to be needed ... so let's do it!
