@@ -195,7 +195,7 @@ RUN --mount=type=bind,target=/src \
     mkdir -p "${OPENSSL_CONF_INCLUDE}" && \
     cp -vf /src/fipsmodule.cnf "${OPENSSL_CONF_INCLUDE}" && \
     chown -R root:root "${OPENSSL_CONF_INCLUDE}" && \
-    chmod -R 0444 "${OPENSSL_CONF_INCLUDE}"
+    chmod -R a=rX "${OPENSSL_CONF_INCLUDE}"
 
 # Get prefix path and path to scripts rather than hard-code them in scripts
 ENV CONTAINER_SCRIPTS_PATH="/usr/share/container-scripts/mysql" \
