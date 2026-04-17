@@ -113,7 +113,7 @@
 
 ARG FIPS=""
 ARG PUBLIC_REGISTRY="public.ecr.aws"
-ARG VER="11.4"
+ARG VER="10.11"
 
 ARG MARIADB_KEYRING_SRC="https://mariadb.org/mariadb_release_signing_key.pgp"
 
