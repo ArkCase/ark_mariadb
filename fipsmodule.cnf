@@ -1,7 +1,0 @@
-[fips_sect]
-activate = 1
-install-version = 1
-conditional-errors = 1
-security-checks = 1
-module-mac = C2:A8:C6:55:D7:47:9F:6E:35:ED:D1:BA:61:0C:40:25:7E:A6:7C:8B:E9:CE:C1:97:1F:2D:F1:35:5A:30:3C:A2
-install-status = INSTALL_SELF_TEST_KATS_RUN

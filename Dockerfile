@@ -184,19 +184,6 @@ RUN --mount=type=bind,target=/src \
     rm -rvf * && \
     test "$(id -u "${APP_USER}"):$(id -g "${APP_GROUP}")" = "${APP_UID}:${APP_GID}"
 
-RUN --mount=type=bind,target=/src \
-    CONF="/etc/ssl/openssl.cnf" && \
-    cp -vf /src/openssl.cnf "${CONF}" && \
-    chown root:root "${CONF}" && \
-    chmod 0444 "${CONF}"
-
-ENV OPENSSL_CONF_INCLUDE="/etc/ssl/openssl.cnf.d"
-RUN --mount=type=bind,target=/src \
-    mkdir -p "${OPENSSL_CONF_INCLUDE}" && \
-    cp -vf /src/fipsmodule.cnf "${OPENSSL_CONF_INCLUDE}" && \
-    chown -R root:root "${OPENSSL_CONF_INCLUDE}" && \
-    chmod -R a=rX "${OPENSSL_CONF_INCLUDE}"
-
 # Get prefix path and path to scripts rather than hard-code them in scripts
 ENV CONTAINER_SCRIPTS_PATH="/usr/share/container-scripts/mysql" \
     MYSQL_PREFIX="/usr"
@@ -227,4 +214,3 @@ CMD ["run-mysqld"]
 ###########################################################################################################
 #   END: MariaDb Image ####################################################################################
 ###########################################################################################################
-
