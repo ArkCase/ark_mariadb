@@ -1,8 +1,0 @@
-#!/bin/bash
-set -euo pipefail
-. /.functions
-
-# Update the SSL stuff
-init_ssl
-
-execute "container-entrypoint" "${@}"

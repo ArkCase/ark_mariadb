@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -euo pipefail
+. /.functions
+
+#
+# Init all the SSL-related stuff
+#
+init_ssl
+
+exec "container-entrypoint" "${@}"

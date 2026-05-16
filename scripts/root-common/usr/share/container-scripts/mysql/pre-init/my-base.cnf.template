@@ -3,7 +3,7 @@ datadir = ${MYSQL_DATADIR}
 basedir = ${MYSQL_PREFIX}
 plugin-dir = ${MYSQL_PREFIX}/lib64/mysql/plugin
 
-ssl-ca=/.ssl/ca-int.pem
+ssl-ca=/.ssl/ca-root.pem
 ssl-cert=/.ssl/cert.pem
 ssl-key=/.ssl/cert.key
 ## Set up TLS version here. For example TLS version 1.2 and 1.3 ##
