@@ -1,6 +1,6 @@
 X-Repolib-Name: MariaDB
 Types: deb
-URIs: https://deb.mariadb.org/${VER}/ubuntu
+URIs: https://archive.mariadb.org/mariadb-${VER}/repo/ubuntu/
 Suites: noble
 Components: main main/debug
 Signed-By: ${KEYRING}

@@ -115,7 +115,7 @@ ARG FIPS=""
 ARG PUBLIC_REGISTRY="public.ecr.aws"
 ARG VER="10.11"
 
-ARG MARIADB_KEYRING_SRC="https://mariadb.org/mariadb_release_signing_key.pgp"
+ARG MARIADB_KEYRING_SRC="https://supplychain.mariadb.com/mariadb-keyring-2019.gpg"
 
 ARG BASE_REGISTRY="${PUBLIC_REGISTRY}"
 ARG BASE_REPO="arkcase/base"
@@ -163,7 +163,7 @@ RUN groupadd --gid "${APP_UID}" --system "${APP_USER}" && \
 RUN --mount=type=bind,target=/src \
     mkdir -p /etc/apt/keyrings && \
     export KEYRING="/etc/apt/trusted.gpg.d/mariadb-keyring.gpg" && \
-    curl -fsSL  "${MARIADB_KEYRING_SRC}" | gpg --dearmor -o "${KEYRING}" && \
+    curl -fsSL  "${MARIADB_KEYRING_SRC}" -o "${KEYRING}" && \
     chmod a=r "${KEYRING}" && \
     SOURCES="/etc/apt/sources.list.d/mariadb.sources" && \
     envsubst < /src/mariadb.sources > "${SOURCES}" && \
