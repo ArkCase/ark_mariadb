@@ -7,4 +7,4 @@ ssl-ca=${SSL_CA_ROOT}
 ssl-cert=${SSL_CERTIFICATE}
 ssl-key=${SSL_PRIVATE_KEY}
 ## Set up TLS version here. For example TLS version 1.2 and 1.3 ##
-tls_version = TLSv1.3
+tls_version = TLSv1.2,TLSv1.3
