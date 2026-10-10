@@ -175,7 +175,7 @@ RUN --mount=type=bind,target=/src \
         mariadb-client \
         mariadb-server \
       && \
-    dpkg --remove --force-depends rsync && \
+    dpkg --purge --force-depends rsync stunnel4 && \
     apt-get clean && \
     mkdir -p "${RUN_DIR}" "${DATA_DIR}" && \
     chown -R "${APP_UID}:${APP_GID}" "${RUN_DIR}" && \
