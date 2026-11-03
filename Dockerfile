@@ -154,13 +154,16 @@ ENV APP_GID="${APP_UID}"
 ENV DATA_DIR="${HOME}/data" \
     RUN_DIR="/run/mysqld"
 
+# Get prefix path and path to scripts rather than hard-code them in scripts
+ENV CONTAINER_SCRIPTS_PATH="/usr/share/container-scripts/mysql" \
+    MYSQL_PREFIX="/usr"
+
 # This image must forever use UID 28 for mysql user so our volumes are
 # safe in the future. This should *never* change, the last test is there
 # to make sure of that.
-RUN groupadd --gid "${APP_UID}" --system "${APP_USER}" && \
-    useradd --gid "${APP_GROUP}" --home-dir "${HOME}" --create-home --shell /sbin/nologin --uid "${APP_UID}" --system "${APP_USER}"
-
 RUN --mount=type=bind,target=/src \
+    groupadd --gid "${APP_UID}" --system "${APP_USER}" && \
+    useradd --gid "${APP_GROUP}" --home-dir "${HOME}" --create-home --shell /sbin/nologin --uid "${APP_UID}" --system "${APP_USER}" && \
     mkdir -p /etc/apt/keyrings && \
     export KEYRING="/etc/apt/trusted.gpg.d/mariadb-keyring.gpg" && \
     curl -fsSL  "${MARIADB_KEYRING_SRC}" -o "${KEYRING}" && \
@@ -182,21 +185,10 @@ RUN --mount=type=bind,target=/src \
     chown -R "${APP_USER}:0" "${HOME}" && \
     cd "${HOME}" && \
     rm -rvf * && \
-    test "$(id -u "${APP_USER}"):$(id -g "${APP_GROUP}")" = "${APP_UID}:${APP_GID}"
-
-# Get prefix path and path to scripts rather than hard-code them in scripts
-ENV CONTAINER_SCRIPTS_PATH="/usr/share/container-scripts/mysql" \
-    MYSQL_PREFIX="/usr"
-
-COPY "scripts/root-common" /
-COPY "scripts/s2i-common/bin/" "/usr/local/bin"
-COPY "scripts/root" /
-
-# this is needed due to issues with squash
-# when this directory gets rm'd by the container-setup
-# script.
-# Also reset permissions of filesystem to default values
-RUN rm -rf /etc/my.cnf.d/* && \
+    test "$(id -u "${APP_USER}"):$(id -g "${APP_GROUP}")" = "${APP_UID}:${APP_GID}" && \
+    ( tar --owner=root --group=root --mode=u=rwX,go=rX -cf - /src/scripts/root-common /src/scripts/root ) | tar --strip-components=3 -C / -xvf - && \
+    ( tar --owner=root --group=root --mode=u=rwX,go=rX -cf - /src/scripts/s2i-common/bin ) | tar --strip-components=4 -C /usr/local/bin -xvf - && \
+    rm -rf /etc/my.cnf.d/* && \
     /usr/libexec/container-setup && \
     /usr/libexec/fix-permissions "${HOME}" && \
     usermod -a -G "${ACM_GROUP}" "${APP_USER}" && \
@@ -208,7 +200,6 @@ RUN rm -rf /etc/my.cnf.d/* && \
 
 USER "${APP_USER}"
 
-ENTRYPOINT ["/entrypoint"]
 CMD ["run-mysqld"]
 
 ###########################################################################################################
