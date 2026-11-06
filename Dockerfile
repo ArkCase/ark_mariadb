@@ -180,6 +180,7 @@ RUN --mount=type=bind,target=/src \
       && \
     dpkg --purge --force-depends rsync stunnel4 && \
     apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
     mkdir -p "${RUN_DIR}" "${DATA_DIR}" && \
     chown -R "${APP_UID}:${APP_GID}" "${RUN_DIR}" && \
     chown -R "${APP_USER}:0" "${HOME}" && \
