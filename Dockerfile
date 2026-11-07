@@ -193,6 +193,8 @@ RUN --mount=type=bind,target=/src \
     /usr/libexec/container-setup && \
     /usr/libexec/fix-permissions "${HOME}" && \
     usermod -a -G "${ACM_GROUP}" "${APP_USER}" && \
+    chown -R "${APP_USER}:${APP_GROUP}" "${TEMP_DIR}" && \
+    chmod -R u=rwX,g=rX,o= "${TEMP_DIR}" && \
     secure-permissions
 
 # Not using VOLUME statement since it's not working in OpenShift Online:
