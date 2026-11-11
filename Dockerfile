@@ -187,8 +187,8 @@ RUN --mount=type=bind,target=/src \
     cd "${HOME}" && \
     rm -rvf * && \
     test "$(id -u "${APP_USER}"):$(id -g "${APP_GROUP}")" = "${APP_UID}:${APP_GID}" && \
-    ( tar --owner=root --group=root --mode=u=rwX,go=rX -cf - /src/scripts/root-common /src/scripts/root ) | tar --strip-components=3 -C / -xvf - && \
-    ( tar --owner=root --group=root --mode=u=rwX,go=rX -cf - /src/scripts/s2i-common/bin ) | tar --strip-components=4 -C /usr/local/bin -xvf - && \
+    copy-tree -v -o root -g root -m u=rwX,go=rX /src/scripts/root-common/ /src/scripts/root/ / && \
+    copy-tree -v -o root -g root -m u=rwX,go=rX /src/scripts/s2i-common/bin/ /usr/local/bin && \
     rm -rf /etc/my.cnf.d/* && \
     /usr/libexec/container-setup && \
     /usr/libexec/fix-permissions "${HOME}" && \
